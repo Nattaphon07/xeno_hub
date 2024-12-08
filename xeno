@@ -1,0 +1,91 @@
+-- โหลด Library สำหรับสร้าง UI
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
+local Window = Library.CreateLib("Xeno Hub ( Projcet gojo 2 🐉 )", "DarkTheme")
+
+-- สร้างแท็บและส่วนต่าง ๆ
+local TpTab = Window:NewTab("เมนู")
+local TpSection = TpTab:NewSection("Auto Coins")
+
+
+-- ฟังก์ชันเพื่อค้นหาไอเทมทั้งหมดใน Workspace ตามชื่อที่กำหนด
+function findItemsByName(itemNames)
+    local items = {}
+    
+    -- ลูปผ่านทุก object ใน Workspace
+    for _, object in pairs(game.Workspace:GetDescendants()) do
+        -- ตรวจสอบว่าชื่อของ object ตรงกับชื่อไอเทมหรือไม่
+        if table.find(itemNames, object.Name) then
+            print("Found item: " .. object.Name)  -- แสดงชื่อไอเทมที่พบ
+            -- ตรวจสอบว่า object เป็น BasePart หรือ Model ที่มี PrimaryPart
+            if object:IsA("BasePart") then
+                table.insert(items, object)  -- เก็บ object ลงในตาราง
+            elseif object:IsA("Model") and object.PrimaryPart then
+                table.insert(items, object)
+            end
+        end
+    end
+    
+    return items
+end
+
+-- ฟังก์ชันเพื่อวาร์ปผู้เล่นไปยังไอเทม
+function teleportToItem(item)
+    local player = game.Players.LocalPlayer
+    if player and player.Character and player.Character.PrimaryPart then
+        print("Teleporting to: " .. item.Name)  -- แจ้งเมื่อเริ่มวาร์ป
+        if item:IsA("BasePart") then
+            player.Character:SetPrimaryPartCFrame(CFrame.new(item.Position))
+        elseif item:IsA("Model") and item.PrimaryPart then
+            player.Character:SetPrimaryPartCFrame(CFrame.new(item.PrimaryPart.Position))
+        end
+    else
+        print("Player or item is missing!")
+    end
+end
+
+-- ตั้งชื่อไอเทมที่ต้องการค้นหา
+local itemNames = {"Dio Bone", "Hamon Breather", "Rokakaka Fruit", "Stand Arrow"}
+
+-- ตัวแปรเพื่อควบคุมสถานะการทำงานของการวาร์ป
+local autoTeleport = false
+local currentIndex = 1 -- ใช้ติดตามว่าอยู่ที่ตำแหน่งไหน
+local items = {}
+
+-- ฟังก์ชันสำหรับเปิดการวาร์ปอัตโนมัติ
+function startAutoTeleport()
+    autoTeleport = true
+    items = findItemsByName(itemNames) -- ค้นหาไอเทมทั้งหมดจากชื่อที่ระบุ
+    
+    while autoTeleport do
+        -- ถ้ามีไอเทมที่พบ
+        if #items > 0 then
+            -- วาร์ปผู้เล่นไปที่ไอเทมในตำแหน่งปัจจุบัน
+            teleportToItem(items[currentIndex])
+            
+            -- อัปเดต index เพื่อวาร์ปไปยังไอเทมถัดไปในครั้งถัดไป
+            currentIndex = currentIndex + 1
+            if currentIndex > #items then
+                currentIndex = 1 -- ถ้าถึงจุดสุดท้ายแล้ว ให้กลับไปที่จุดแรก
+            end
+        else
+            print("ไม่พบไอเทมที่ต้องการ")
+        end
+        
+        -- รอ 0.7 วินาทีก่อนจะรันอีกครั้ง
+        wait(1.5)
+    end
+end
+
+-- ฟังก์ชันสำหรับปิดการวาร์ปอัตโนมัติ
+function stopAutoTeleport()
+    autoTeleport = false
+end
+
+-- เพิ่มปุ่มในเมนูสำหรับการเปิด/ปิดการวาร์ปอัตโนมัติ
+TpSection:NewToggle("เปิด/ปิด", "วาร์ปไปยัง Coins และ MegaCoins ทุก ๆ 10 วินาที", function(state)
+    if state then
+        startAutoTeleport()
+    else
+        stopAutoTeleport()
+    end
+end)
