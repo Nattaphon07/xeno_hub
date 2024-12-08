@@ -44,7 +44,7 @@ function teleportToItem(item)
 end
 
 -- ตั้งชื่อไอเทมที่ต้องการค้นหา
-local itemNames = {"Dio Bone", "Hamon Breather", "Rokakaka Fruit", "Stand Arrow"}
+local itemNames = {"Aja Mask", "Corpse Part", "Dio Bone", "Dio Diary", "Hamon Breather", "New Rokakaka", "Requiem Arrow", "Rokakaka Fruit", "Sinners Soul", "Stand Arrow", "Steel Ball", "Stone Rokakaka", "Vampire Mask"}
 
 -- ตัวแปรเพื่อควบคุมสถานะการทำงานของการวาร์ป
 local autoTeleport = false
