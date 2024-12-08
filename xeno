@@ -72,7 +72,7 @@ function startAutoTeleport()
         end
         
         -- รอ 0.7 วินาทีก่อนจะรันอีกครั้ง
-        wait(1.5)
+        wait(3)
     end
 end
 
